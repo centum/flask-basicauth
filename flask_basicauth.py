@@ -42,11 +42,15 @@ class BasicAuth(object):
         """
         app.config.setdefault('BASIC_AUTH_FORCE', False)
         app.config.setdefault('BASIC_AUTH_REALM', '')
+        app.config.setdefault('BASIC_AUTH_FORCE_EXCLUDE', [])
 
         @app.before_request
         def require_basic_auth():
             if not current_app.config['BASIC_AUTH_FORCE']:
                 return
+            for path in current_app.config['BASIC_AUTH_FORCE_EXCLUDE']:
+                if request.path.startswith(path):
+                    return
             if not self.authenticate():
                 return self.challenge()
 
